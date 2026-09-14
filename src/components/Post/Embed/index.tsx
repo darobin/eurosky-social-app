@@ -27,6 +27,8 @@ import {Embed as StarterPackCard} from '#/components/StarterPack/StarterPackCard
 import {SubtleHover} from '#/components/SubtleHover'
 import {matchCustomEmbed} from '#/features/customEmbeds/registry'
 import {NewsroomLinkChip} from '#/features/newsrooms/components/NewsroomLinkChip'
+import {SponsoredLinkEmbed} from '#/features/sponsoredLinks/components/SponsoredLinkEmbed'
+import {shouldDecorateSponsoredLink} from '#/features/sponsoredLinks/detect'
 import {app} from '#/lexicons'
 import * as bsky from '#/types/bsky'
 import {
@@ -142,6 +144,22 @@ function MediaEmbed({
               onOpen={rest.onOpen}
               style={rest.style}
             />
+          </ContentHider>
+        )
+      }
+      // EUROSKY: sponsored links decorate flagged links with an ad and swap in
+      // a gift URL. See src/features/sponsoredLinks/README.md.
+      if (shouldDecorateSponsoredLink(embed.view.external)) {
+        return (
+          <ContentHider
+            modui={rest.moderation?.ui('contentMedia')}
+            activeStyle={[a.mt_sm]}>
+            <SponsoredLinkEmbed
+              link={embed.view.external}
+              onOpen={rest.onOpen}
+              style={[a.mt_sm, rest.style]}
+            />
+            <NewsroomLinkChip url={embed.view.external.uri} style={[a.mt_xs]} />
           </ContentHider>
         )
       }

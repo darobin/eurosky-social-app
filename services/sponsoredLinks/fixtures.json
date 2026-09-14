@@ -1,0 +1,26 @@
+{
+  "_comment": "Fake creatives for the sponsored-links dev server. Edited live: the server re-reads this file on every request. A creative applies to any link whose host is one of `domains` or a subdomain of one. Omit bannerUrl/logoUrl to get generated SVG art in the `accent` color. `did`/`handle` are optional; use a real handle to make the sponsor link resolve in the app.",
+  "creatives": [
+    {
+      "slug": "kobler",
+      "domains": ["berjon.com", "globalvoices.org"],
+      "sponsor": {"name": "Kobler", "handle": "kobler.no"},
+      "text": "Ads you can trust.",
+      "accent": "#fdf30b"
+    },
+    {
+      "slug": "whereby",
+      "domains": ["berjon.com", "globalvoices.org"],
+      "sponsor": {"name": "Whereby", "handle": "whereby.com"},
+      "text": "Online meetings that don't make you angry.",
+      "accent": "#f5d2cc"
+    },
+    {
+      "slug": "supramundane",
+      "domains": ["berjon.com", "globalvoices.org"],
+      "sponsor": {"name": "Supramundane Agency"},
+      "text": "We bring democracy to the internet.",
+      "accent": "#dc1b27"
+    }
+  ]
+}

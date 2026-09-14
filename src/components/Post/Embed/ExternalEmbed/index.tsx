@@ -30,12 +30,20 @@ export const ExternalEmbed = ({
   post,
   style,
   hideAlt,
+  openUri,
 }: {
   link: app.bsky.embed.external.ViewExternal
   onOpen?: () => void
   post?: app.bsky.feed.defs.PostView
   style?: StyleProp<ViewStyle>
   hideAlt?: boolean
+  /**
+   * EUROSKY: URL to open instead of `link.uri`, e.g. a sponsored gift link.
+   * Display (title, domain) and sharing still use `link.uri`. The override is
+   * opened directly, without the redirect proxy or the iOS peek preview, since
+   * it may be single-use.
+   */
+  openUri?: string
 }) => {
   const {_} = useLingui()
   const t = useTheme()
@@ -88,9 +96,9 @@ export const ExternalEmbed = ({
   return (
     <Link
       label={link.title || _(msg`Open link to ${niceUrl}`)}
-      to={link.uri}
-      shouldProxy={true}
-      peek
+      to={openUri ?? link.uri}
+      shouldProxy={!openUri}
+      peek={!openUri}
       style={[a.rounded_md]}
       onPress={onPress}
       onLongPress={onShareExternal}>

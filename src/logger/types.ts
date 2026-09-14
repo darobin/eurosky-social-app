@@ -17,6 +17,7 @@ export enum LogContext {
   Geolocation = 'geolocation',
   Drafts = 'drafts',
   Growthbook = 'growthbook',
+  SponsoredLinks = 'sponsored-links',
 
   /**
    * METRIC IS FOR INTERNAL USE ONLY, don't create any other loggers using this

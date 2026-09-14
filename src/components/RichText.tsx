@@ -13,6 +13,7 @@ import {type CodePart, parseCodeParts} from '#/components/RichTextCode'
 import {RichTextTag} from '#/components/RichTextTag'
 import {Text, type TextProps} from '#/components/Typography'
 import {IS_NATIVE} from '#/env'
+import {SponsoredInlineLinkText} from '#/features/sponsoredLinks/components/SponsoredInlineLinkText'
 import {app} from '#/lexicons'
 import * as bsky from '#/types/bsky'
 
@@ -249,10 +250,12 @@ export function RichText({
       if (!isValidLink || disableLinks) {
         parts.push({block: false, node: toShortUrl(segment.text)})
       } else {
+        // EUROSKY: opens the sponsored gift URL when the post's link card has
+        // obtained one for this link. See src/features/sponsoredLinks/README.md.
         parts.push({
           block: false,
           node: (
-            <InlineLinkText
+            <SponsoredInlineLinkText
               selectable={selectable}
               key={key}
               to={link.uri}
@@ -264,7 +267,7 @@ export function RichText({
               onPress={onLinkPress}
               emoji>
               {toShortUrl(segment.text)}
-            </InlineLinkText>
+            </SponsoredInlineLinkText>
           ),
         })
       }
