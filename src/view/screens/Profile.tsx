@@ -50,6 +50,8 @@ import {VideoClip_Stroke1_Corner0_Rounded as VideoIcon} from '#/components/icons
 import * as Layout from '#/components/Layout'
 import {ScreenHider} from '#/components/moderation/ScreenHider'
 import {ProfileStarterPacks} from '#/components/StarterPack/ProfileStarterPacks'
+import {useActorStatus} from '#/features/liveNow'
+import {LiveEmbed} from '#/features/liveNow/components/LiveEmbed'
 import {type app} from '#/lexicons'
 import {navigate} from '#/Navigation'
 
@@ -215,6 +217,21 @@ function ProfileScreenLoaded({
 
   const isMe = profile.did === currentAccount?.did
   const hasLabeler = !!profile.associated?.labeler
+  /*
+   * While the account is live, the stream itself is embedded above their
+   * posts (when the linked service can be played inline) rather than only
+   * being reachable through the avatar popup.
+   */
+  const live = useActorStatus(profile)
+  const liveEmbedHeader =
+    live.isActive && live.embed ? (
+      <LiveEmbed
+        profile={profile}
+        status={live}
+        embed={live.embed}
+        isMe={isMe}
+      />
+    ) : undefined
   const showFiltersTab = hasLabeler
   const showPostsTab = true
   const showRepliesTab = hasSession
@@ -452,6 +469,7 @@ function ProfileScreenLoaded({
                       }
                     : undefined
                 }
+                ListHeaderComponent={liveEmbedHeader}
                 postFeedRef={postFeedRef}
               />
             )

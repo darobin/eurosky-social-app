@@ -389,6 +389,7 @@ let Card = ({
             profile={data}
             embed={status.embed}
             padding="lg"
+            embedPlayer={false}
             onPressOpenProfile={onPressOpenProfile}
           />
         ) : (

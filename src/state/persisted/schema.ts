@@ -124,6 +124,7 @@ const schema = z.object({
       youtube: z.enum(externalEmbedOptions).optional(),
       youtubeShorts: z.enum(externalEmbedOptions).optional(),
       twitch: z.enum(externalEmbedOptions).optional(),
+      streamplace: z.enum(externalEmbedOptions).optional(),
       vimeo: z.enum(externalEmbedOptions).optional(),
       spotify: z.enum(externalEmbedOptions).optional(),
       appleMusic: z.enum(externalEmbedOptions).optional(),

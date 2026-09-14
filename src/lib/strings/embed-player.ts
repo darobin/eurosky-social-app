@@ -18,6 +18,7 @@ export const embedPlayerSources = [
   'youtube',
   'youtubeShorts',
   'twitch',
+  'streamplace',
   'spotify',
   'soundcloud',
   'appleMusic',
@@ -36,6 +37,7 @@ export type EmbedPlayerType =
   | 'youtube_video'
   | 'youtube_short'
   | 'twitch_video'
+  | 'streamplace_live'
   | 'spotify_album'
   | 'spotify_playlist'
   | 'spotify_song'
@@ -58,6 +60,7 @@ export const externalEmbedLabels: Record<EmbedPlayerSource, string> = {
   youtubeShorts: 'YouTube Shorts',
   vimeo: 'Vimeo',
   twitch: 'Twitch',
+  streamplace: 'Streamplace',
   giphy: 'GIPHY',
   tenor: 'Tenor',
   klipy: 'KLIPY',
@@ -97,6 +100,20 @@ export interface EmbedPlayerParams {
     width: number
   }
 }
+
+/*
+ * Top-level stream.place paths that are site pages rather than a streamer's
+ * handle, so a link to them never turns into a player.
+ */
+const STREAMPLACE_RESERVED_PATHS = new Set([
+  'about',
+  'api',
+  'docs',
+  'embed',
+  'login',
+  'settings',
+  'signup',
+])
 
 const giphyRegex = /media(?:[0-4]\.giphy\.com|\.giphy\.com)/i
 const gifFilenameRegex = /^(\S+)\.(webp|gif|mp4)$/i
@@ -195,6 +212,31 @@ export function parseEmbedPlayerFromUrl(
         type: 'twitch_video',
         source: 'twitch',
         playerUri: `https://player.twitch.tv/?volume=0.5&!muted&autoplay&channel=${channelOrVideo}&parent=${parent}`,
+      }
+    }
+  }
+
+  /*
+   * Streamplace. A stream lives at stream.place/<handle> and its documented
+   * embed at stream.place/embed/<handle> (https://stream.place/docs/features/embed/).
+   * Accept either form so a pasted embed link works too.
+   */
+  if (
+    urlp.hostname === 'stream.place' ||
+    urlp.hostname === 'www.stream.place'
+  ) {
+    const [first, second, ...rest] = urlp.pathname.split('/').filter(Boolean)
+    let handle: string | undefined
+    if (first === 'embed' && second && rest.length === 0) {
+      handle = second
+    } else if (first && !second) {
+      handle = first
+    }
+    if (handle && !STREAMPLACE_RESERVED_PATHS.has(handle.toLowerCase())) {
+      return {
+        type: 'streamplace_live',
+        source: 'streamplace',
+        playerUri: `https://stream.place/embed/${encodeURIComponent(handle)}`,
       }
     }
   }
@@ -557,6 +599,7 @@ export function getPlayerAspect({
   switch (type) {
     case 'youtube_video':
     case 'twitch_video':
+    case 'streamplace_live':
     case 'vimeo_video':
       return {aspectRatio: 16 / 9}
     case 'youtube_short':

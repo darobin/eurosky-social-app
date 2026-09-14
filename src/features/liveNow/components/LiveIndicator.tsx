@@ -4,6 +4,37 @@ import {Trans} from '@lingui/react/macro'
 import {atoms as a, tokens, useTheme} from '#/alf'
 import {Text} from '#/components/Typography'
 
+/**
+ * In-flow "LIVE" badge for text rows (the embedded player's footer, the live
+ * popup). `LiveIndicator` below is the absolutely positioned avatar variant.
+ */
+export function LivePill() {
+  const t = useTheme()
+  return (
+    <View
+      style={[
+        a.rounded_xs,
+        {
+          backgroundColor: t.palette.negative_500,
+          paddingVertical: 2,
+          paddingHorizontal: 5,
+        },
+      ]}>
+      <Text
+        style={[
+          a.text_2xs,
+          a.font_bold,
+          a.leading_tight,
+          {color: t.palette.white},
+        ]}>
+        <Trans comment="Live badge next to an embedded livestream. Keep very short.">
+          LIVE
+        </Trans>
+      </Text>
+    </View>
+  )
+}
+
 export function LiveIndicator({
   size = 'small',
   style,

@@ -1101,3 +1101,30 @@ describe('klipyUrlToBskyGifUrl', () => {
     expect(klipyUrlToBskyGifUrl('not-a-url')).toEqual('')
   })
 })
+
+describe('parseEmbedPlayerFromUrl (Streamplace)', () => {
+  it.each([
+    ['https://stream.place/iame.li', 'iame.li'],
+    ['https://www.stream.place/iame.li', 'iame.li'],
+    ['https://stream.place/iame.li?ref=bsky', 'iame.li'],
+    ['https://stream.place/iame.li/', 'iame.li'],
+    ['https://stream.place/embed/iame.li', 'iame.li'],
+  ])('parses %s as a Streamplace live embed', (input, handle) => {
+    expect(parseEmbedPlayerFromUrl(input)).toEqual({
+      type: 'streamplace_live',
+      source: 'streamplace',
+      playerUri: `https://stream.place/embed/${handle}`,
+    })
+  })
+
+  it.each([
+    'https://stream.place/',
+    'https://stream.place/docs/features/embed/',
+    'https://stream.place/docs',
+    'https://stream.place/embed/',
+    'https://stream.place/iame.li/clips/abc',
+    'https://stream.place/embed/iame.li/extra',
+  ])('does not treat %s as a livestream', input => {
+    expect(parseEmbedPlayerFromUrl(input)).toBeUndefined()
+  })
+})

@@ -37,6 +37,8 @@ interface FeedSectionProps {
   emptyStateButton?: EmptyStateButtonProps
   emptyStateIcon?: React.ComponentType<any> | React.ReactElement
   postFeedRef?: React.Ref<PostFeedRef>
+  /** Rendered above the first post, e.g. the live embed on a profile. */
+  ListHeaderComponent?: React.ReactElement
 }
 
 export function ProfileFeedSection({
@@ -51,6 +53,7 @@ export function ProfileFeedSection({
   emptyStateButton,
   emptyStateIcon,
   postFeedRef,
+  ListHeaderComponent,
 }: FeedSectionProps) {
   const {_} = useLingui()
   const queryClient = useQueryClient()
@@ -113,6 +116,7 @@ export function ProfileFeedSection({
           shouldUseAdjustedNumToRender ? adjustedInitialNumToRender : undefined
         }
         isVideoFeed={isVideoFeed}
+        ListHeaderComponent={ListHeaderComponent}
         ref={postFeedRef}
       />
       {(isScrolledDown || hasNew) && (

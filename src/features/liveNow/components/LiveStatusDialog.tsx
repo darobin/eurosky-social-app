@@ -8,6 +8,7 @@ import {useQueryClient} from '@tanstack/react-query'
 
 import {useOpenLink} from '#/lib/hooks/useOpenLink'
 import {type NavigationProp} from '#/lib/routes/types'
+import {externalEmbedLabels} from '#/lib/strings/embed-player'
 import {sanitizeHandle} from '#/lib/strings/handles'
 import {toNiceDomain} from '#/lib/strings/url-helpers'
 import {useModerationOpts} from '#/state/preferences/moderation-opts'
@@ -22,10 +23,15 @@ import {SquareArrowTopRight_Stroke2_Corner0_Rounded as SquareArrowTopRightIcon} 
 import {createStaticClick, SimpleInlineLinkText} from '#/components/Link'
 import * as Hider from '#/components/moderation/Hider'
 import {useGlobalReportDialogControl} from '#/components/moderation/ReportDialog'
+import {ExternalPlayer} from '#/components/Post/Embed/ExternalEmbed/ExternalPlayer'
 import * as ProfileCard from '#/components/ProfileCard'
 import {Text} from '#/components/Typography'
 import {useAnalytics} from '#/analytics'
-import {LiveIndicator} from '#/features/liveNow/components/LiveIndicator'
+import {
+  LiveIndicator,
+  LivePill,
+} from '#/features/liveNow/components/LiveIndicator'
+import {useLiveEmbedPlayerParams} from '#/features/liveNow/useLiveEmbedPlayerParams'
 import {type app} from '#/lexicons'
 import type * as bsky from '#/types/bsky'
 
@@ -41,9 +47,10 @@ export function LiveStatusDialog({
   embed: app.bsky.embed.external.View
 }) {
   const navigation = useNavigation<NavigationProp>()
+  const player = useLiveEmbedPlayerParams(embed.external.uri)
   return (
     <Dialog.Outer control={control} nativeOptions={{preventExpansion: true}}>
-      <Dialog.Handle difference={!!embed.external.thumb} />
+      <Dialog.Handle difference={!!player || !!embed.external.thumb} />
       <DialogInner
         status={status}
         profile={profile}
@@ -97,12 +104,19 @@ export function LiveStatus({
   profile,
   embed,
   padding = 'xl',
+  embedPlayer = true,
   onPressOpenProfile,
 }: {
   status: app.bsky.actor.defs.StatusView
   profile: bsky.profile.AnyProfileView
   embed: app.bsky.embed.external.View
   padding?: 'lg' | 'xl'
+  /**
+   * Play the stream inline when its service has a live player. Off for
+   * transient surfaces like the hover card, which keep the thumbnail and
+   * outbound link.
+   */
+  embedPlayer?: boolean
   onPressOpenProfile: () => void
 }) {
   const ax = useAnalytics()
@@ -117,61 +131,72 @@ export function LiveStatus({
     if (!moderationOpts) return undefined
     return moderateStatus(profile, moderationOpts)
   }, [profile, moderationOpts])
+  const liveParams = useLiveEmbedPlayerParams(embed.external.uri)
+  const player = embedPlayer ? liveParams : undefined
+  const serviceName = player ? externalEmbedLabels[player.source] : ''
+  const hasMedia = !!player || !!embed.external.thumb
+  const mediaCorners = android([
+    a.overflow_hidden,
+    {
+      borderTopLeftRadius: a.rounded_md.borderRadius,
+      borderTopRightRadius: a.rounded_md.borderRadius,
+    },
+  ])
 
   return (
     <>
-      {embed.external.thumb && (
+      {hasMedia && (
         <Hider.Outer modui={moderation?.ui('contentMedia')}>
           <Hider.Mask>
             <ModeratedImage />
           </Hider.Mask>
           <Hider.Content>
-            <View
-              style={[
-                t.atoms.bg_contrast_25,
-                a.w_full,
-                a.aspect_card,
-                android([
-                  a.overflow_hidden,
-                  {
-                    borderTopLeftRadius: a.rounded_md.borderRadius,
-                    borderTopRightRadius: a.rounded_md.borderRadius,
-                  },
-                ]),
-              ]}>
-              <Image
-                source={embed.external.thumb}
-                contentFit="cover"
-                style={[a.absolute, a.inset_0]}
-                accessibilityIgnoresInvertColors
-                useAppleWebpCodec
-              />
-              <LiveIndicator
-                size="large"
+            {player ? (
+              <View style={[t.atoms.bg_contrast_25, a.w_full, mediaCorners]}>
+                <ExternalPlayer link={embed.external} params={player} />
+              </View>
+            ) : (
+              <View
                 style={[
-                  a.absolute,
-                  {top: tokens.space.lg, left: tokens.space.lg},
-                  a.align_start,
-                ]}
-              />
-            </View>
+                  t.atoms.bg_contrast_25,
+                  a.w_full,
+                  a.aspect_card,
+                  mediaCorners,
+                ]}>
+                <Image
+                  source={embed.external.thumb}
+                  contentFit="cover"
+                  style={[a.absolute, a.inset_0]}
+                  accessibilityIgnoresInvertColors
+                  useAppleWebpCodec
+                />
+                <LiveIndicator
+                  size="large"
+                  style={[
+                    a.absolute,
+                    {top: tokens.space.lg, left: tokens.space.lg},
+                    a.align_start,
+                  ]}
+                />
+              </View>
+            )}
           </Hider.Content>
         </Hider.Outer>
       )}
       <View
         style={[
           a.gap_lg,
-          padding === 'xl'
-            ? [a.px_xl, !embed.external.thumb ? a.pt_2xl : a.pt_lg]
-            : a.p_lg,
+          padding === 'xl' ? [a.px_xl, hasMedia ? a.pt_lg : a.pt_2xl] : a.p_lg,
         ]}>
         <View style={[a.w_full, a.justify_center, a.gap_2xs]}>
           <Text
+            emoji
             numberOfLines={3}
             style={[a.leading_snug, a.font_semi_bold, a.text_xl]}>
             {embed.external.title || embed.external.uri}
           </Text>
-          <View style={[a.flex_row, a.align_center, a.gap_2xs]}>
+          <View style={[a.flex_row, a.align_center, a.gap_xs]}>
+            {player && <LivePill />}
             <Globe_Stroke2_Corner0_Rounded
               size="xs"
               style={[t.atoms.text_contrast_medium]}
@@ -183,17 +208,26 @@ export function LiveStatus({
             </Text>
           </View>
         </View>
+        {/*
+         * With the stream playing inline the outbound link becomes the
+         * secondary action, but it stays: people may prefer the service's own
+         * page (chat, quality settings).
+         */}
         <Button
-          label={l`Watch now`}
+          label={player ? l`Watch on ${serviceName}` : l`Watch now`}
           size={platform({native: 'large', web: 'small'})}
-          color="primary"
+          color={player ? 'secondary' : 'primary'}
           variant="solid"
           onPress={() => {
             ax.metric('live:card:watch', {subject: profile.did})
             openLink(embed.external.uri, false)
           }}>
           <ButtonText>
-            <Trans>Watch now</Trans>
+            {player ? (
+              <Trans>Watch on {serviceName}</Trans>
+            ) : (
+              <Trans>Watch now</Trans>
+            )}
           </ButtonText>
           <ButtonIcon icon={SquareArrowTopRightIcon} />
         </Button>
@@ -270,7 +304,7 @@ export function LiveStatus({
   )
 }
 
-function ModeratedImage() {
+export function ModeratedImage() {
   const t = useTheme()
   const {t: l} = useLingui()
   const hider = Hider.useHider()
