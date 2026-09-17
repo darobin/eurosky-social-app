@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="2400" height="400" viewBox="0 0 2400 400">
+  <rect width="100%" height="100%" fill="#000"/>
+  <circle cx="1040" cy="200" r="150" fill="#fff" fill-opacity="0.12"/>
+  <circle cx="1120" cy="80" r="70" fill="#fff" fill-opacity="0.12"/>
+  <text x="60" y="190" font-family="Helvetica, Arial, sans-serif" font-size="72" font-weight="700" fill="#fdf30b">Kobler</text>
+  <text x="60" y="260" font-family="Helvetica, Arial, sans-serif" font-size="34" fill="#fdf30b" fill-opacity="0.9">Sponsored - this story is on us</text>
+  <text x="60" y="350" font-family="Helvetica, Arial, sans-serif" font-size="24" fill="#fdf30b" fill-opacity="0.7">fake creative from services/sponsoredLinks/dev-server.mjs</text>
+</svg>

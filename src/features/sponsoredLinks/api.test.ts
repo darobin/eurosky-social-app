@@ -57,6 +57,11 @@ describe('parseSponsoredLinkAd', () => {
     expect(parseSponsoredLinkAd({ad: validAd})).toEqual(validAd)
   })
 
+  it('accepts a campaign clickUrl', () => {
+    const ad = {...validAd, clickUrl: 'https://sponsor.example/campaign'}
+    expect(parseSponsoredLinkAd({ad})).toEqual(ad)
+  })
+
   it('accepts a sponsor identified by DID and/or handle', () => {
     const ad = {
       ...validAd,

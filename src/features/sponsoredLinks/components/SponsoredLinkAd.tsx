@@ -11,7 +11,8 @@ import {Text} from '#/components/Typography'
 import {type SponsoredLinkAd as SponsoredLinkAdData} from '../types'
 
 const LOGO_SIZE = 20
-const DEFAULT_BANNER_ASPECT_RATIO = 3
+/** Banners are a fixed 6:1 strip; the creative's own dimensions are informational. */
+const BANNER_ASPECT_RATIO = 6
 
 /** In-app profile route for the sponsor's AT account, if the ad names one. */
 export function getSponsorProfileLink(
@@ -22,10 +23,12 @@ export function getSponsorProfileLink(
 }
 
 /**
- * The creative shown beneath a sponsored link card: sponsor logo and name, a
- * "Sponsored" marker, the banner, the sponsor's short copy, and a note that the
- * link is a gift. The whole panel links to the sponsor's profile when the ad
- * identifies their AT account.
+ * The creative section of a sponsored link card. Not a box of its own: it
+ * renders inside `SponsoredLinkEmbed`'s shared frame, on a grey ground that
+ * sets it apart from the link card above it. Two link targets, deliberately
+ * split: the sponsor's NAME (and logo) go to their profile, while the rest
+ * of the creative - banner and copy - goes wherever the campaign links
+ * (`ad.clickUrl`).
  */
 export function SponsoredLinkAd({
   ad,
@@ -37,65 +40,54 @@ export function SponsoredLinkAd({
   const t = useTheme()
   const {t: l} = useLingui()
   const profileLink = getSponsorProfileLink(ad.sponsor)
-  const bannerAspectRatio =
-    ad.banner.width && ad.banner.height
-      ? ad.banner.width / ad.banner.height
-      : DEFAULT_BANNER_ASPECT_RATIO
 
-  const renderPanel = ({
+  const sponsorIdentity = ({hovered = false}: {hovered?: boolean}) => (
+    <View style={[a.flex_row, a.align_center, a.gap_xs]}>
+      {ad.sponsor.logoUrl ? (
+        <Image
+          style={[
+            a.rounded_xs,
+            {width: LOGO_SIZE, height: LOGO_SIZE},
+            t.atoms.bg_contrast_50,
+          ]}
+          source={{uri: ad.sponsor.logoUrl}}
+          accessibilityIgnoresInvertColors
+          contentFit="cover"
+        />
+      ) : null}
+      <Text
+        emoji
+        numberOfLines={1}
+        style={[
+          a.text_sm,
+          a.font_bold,
+          a.leading_snug,
+          hovered && a.underline,
+        ]}>
+        {ad.sponsor.name}
+      </Text>
+    </View>
+  )
+
+  const creativeBody = ({
     hovered = false,
     pressed = false,
   }: {
     hovered?: boolean
     pressed?: boolean
   }) => (
+    /*
+     * `Link` is a centered flex row, so without an explicit width this view
+     * would shrink to its content and the banner's 100% would be meaningless.
+     */
     <View
       style={[
-        a.transition_color,
         a.flex_col,
-        a.rounded_md,
-        a.overflow_hidden,
         a.w_full,
-        a.border,
-        t.atoms.bg_contrast_25,
-        hovered || pressed
-          ? t.atoms.border_contrast_high
-          : t.atoms.border_contrast_low,
+        (hovered || pressed) && t.atoms.bg_contrast_50,
       ]}>
-      <View style={[a.flex_row, a.align_center, a.gap_xs, a.px_md, a.py_sm]}>
-        {ad.sponsor.logoUrl ? (
-          <Image
-            style={[
-              a.rounded_xs,
-              {width: LOGO_SIZE, height: LOGO_SIZE},
-              t.atoms.bg_contrast_50,
-            ]}
-            source={{uri: ad.sponsor.logoUrl}}
-            accessibilityIgnoresInvertColors
-            contentFit="cover"
-          />
-        ) : null}
-        <Text
-          emoji
-          numberOfLines={1}
-          style={[a.flex_1, a.text_sm, a.font_bold, a.leading_snug]}>
-          {ad.sponsor.name}
-        </Text>
-        <View style={[a.flex_row, a.align_center, a.gap_2xs]}>
-          <Sparkle size="xs" style={[t.atoms.text_contrast_medium]} />
-          <Text
-            style={[
-              a.text_xs,
-              a.font_semi_bold,
-              a.leading_snug,
-              t.atoms.text_contrast_medium,
-            ]}>
-            <Trans context="Marker on an advertisement">Sponsored</Trans>
-          </Text>
-        </View>
-      </View>
       <Image
-        style={[a.w_full, {aspectRatio: bannerAspectRatio}]}
+        style={[a.w_full, {aspectRatio: BANNER_ASPECT_RATIO}]}
         source={{uri: ad.banner.url}}
         alt={ad.banner.alt}
         accessibilityIgnoresInvertColors
@@ -119,16 +111,43 @@ export function SponsoredLinkAd({
     </View>
   )
 
-  if (!profileLink) {
-    return <View style={style}>{renderPanel({})}</View>
-  }
-
   return (
-    <Link
-      to={profileLink}
-      label={l`Sponsored by ${ad.sponsor.name}. View the sponsor's profile`}
-      style={[a.rounded_md, style]}>
-      {renderPanel}
-    </Link>
+    <View style={[a.flex_col, a.w_full, t.atoms.bg_contrast_25, style]}>
+      <View style={[a.flex_row, a.align_center, a.gap_xs, a.px_md, a.py_sm]}>
+        {profileLink ? (
+          <Link
+            to={profileLink}
+            label={l`Sponsored by ${ad.sponsor.name}. View the sponsor's profile`}
+            style={[a.flex_shrink]}>
+            {sponsorIdentity}
+          </Link>
+        ) : (
+          sponsorIdentity({})
+        )}
+        <View style={[a.flex_1]} />
+        <View style={[a.flex_row, a.align_center, a.gap_2xs]}>
+          <Sparkle size="xs" style={[t.atoms.text_contrast_medium]} />
+          <Text
+            style={[
+              a.text_xs,
+              a.font_semi_bold,
+              a.leading_snug,
+              t.atoms.text_contrast_medium,
+            ]}>
+            <Trans context="Marker on an advertisement">Sponsored</Trans>
+          </Text>
+        </View>
+      </View>
+      {ad.clickUrl ? (
+        <Link
+          to={ad.clickUrl}
+          label={l`Open the ${ad.sponsor.name} campaign`}
+          style={[a.w_full]}>
+          {creativeBody}
+        </Link>
+      ) : (
+        creativeBody({})
+      )}
+    </View>
   )
 }

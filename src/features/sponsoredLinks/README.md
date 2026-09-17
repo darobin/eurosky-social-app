@@ -54,7 +54,7 @@ Upstream touchpoints, each marked `EUROSKY`:
 {
   "ad": {
     "id": "creative-123",
-    "banner": {"url": "https://...", "alt": "...", "width": 1200, "height": 400},
+    "banner": {"url": "https://...", "alt": "...", "width": 2400, "height": 400},
     "sponsor": {
       "name": "North Star Bank",
       "logoUrl": "https://...",
@@ -62,14 +62,19 @@ Upstream touchpoints, each marked `EUROSKY`:
       "handle": "northstar.example.com"
     },
     "text": "North Star Bank unlocked this story for you.",
-    "giftUrl": "https://.../gift/abc"
+    "giftUrl": "https://.../gift/abc",
+    "clickUrl": "https://northstar.example.com/campaign"
   }
 }
 ```
 
-`banner.alt`, `banner.width`/`height` (used for the aspect ratio, default 3:1),
-`sponsor.logoUrl`, `sponsor.did` and `sponsor.handle` are optional. The panel
-links to the sponsor's profile when a DID or handle is present. Payloads that
+Banners are rendered as a 6:1 strip (e.g. 2400x400), cropped to fit if the
+image is not. `banner.alt`, `banner.width`/`height` (informational),
+`sponsor.logoUrl`, `sponsor.did`, `sponsor.handle` and `clickUrl` are optional.
+The link card and the creative share one box: the creative sits beneath the
+card on a grey ground behind a dividing rule. The sponsor's NAME links to
+their profile (when a DID or handle is present); the rest of the creative -
+banner and copy - links to `clickUrl`, the campaign's own destination. Payloads that
 fail validation are logged (`EXPO_PUBLIC_LOG_DEBUG=sponsored-links`) and
 treated as "no ad".
 

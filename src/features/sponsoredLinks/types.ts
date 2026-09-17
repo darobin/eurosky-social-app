@@ -7,6 +7,7 @@ import {z} from 'zod'
 export const sponsoredLinkAdSchema = z.object({
   /** Opaque creative identifier, for logging. */
   id: z.string().min(1),
+  /** Rendered as a 6:1 strip (e.g. 2400x400). `width`/`height` are informational. */
   banner: z.object({
     url: z.string().url(),
     alt: z.string().optional(),
@@ -24,6 +25,9 @@ export const sponsoredLinkAdSchema = z.object({
   text: z.string(),
   /** Single-use URL that bypasses the paywall. Replaces the post's link. */
   giftUrl: z.string().url(),
+  /** Where the campaign sends a click on the creative (banner and copy).
+      The sponsor NAME always links to their profile instead. */
+  clickUrl: z.string().url().optional(),
 })
 
 export type SponsoredLinkAd = z.infer<typeof sponsoredLinkAdSchema>

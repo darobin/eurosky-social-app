@@ -24,12 +24,19 @@ creative from `fixtures.json`, and its link opens a single-use gift URL served
 by this process (`/gift/<token>`: 302 once, 410 afterwards).
 
 - Edit `fixtures.json` freely; it is re-read on every request.
+- When several creatives match a domain, one is chosen at random per request
+  — reload the post to rotate through them.
 - A link whose path contains `no-ad` is always declined (204), which exercises
   the plain-card fallback.
 - `SPONSORED_LINKS_LATENCY_MS=1500 node ...` simulates a slow service.
 - `curl localhost:8789/` lists the loaded creatives and every gift link minted
   so far.
-- Banners and logos are generated SVGs unless a creative sets `bannerUrl` /
-  `logoUrl`.
+- Banners and logos are generated SVGs (text color picked for contrast with
+  the `accent`) unless a creative sets `bannerUrl` / `logoUrl` — or you drop
+  real art into `./assets/`: a file named `<slug>-banner.*` or `<slug>-logo.*`
+  is used automatically, and anything in there is served at
+  `/assets/files/<name>`.
+- Clicks on the creative go to the fixture's `clickUrl`, or to the built-in
+  stand-in landing page `/campaign/<slug>` when none is set.
 
 The server keeps gift tokens in memory only; restarting it invalidates them.
