@@ -1,29 +1,198 @@
 {
-  "_comment": "Fake creatives for the sponsored-links dev server. Edited live: the server re-reads this file on every request. A creative applies to any link whose host is one of `domains` or a subdomain of one; when several match, one is chosen at random per request. Omit bannerUrl/logoUrl to get generated SVG art in the `accent` color — or drop a file named <slug>-banner.* / <slug>-logo.* into ./assets/ to use real art. `clickUrl` is where the creative body sends a click (default: the dev server's own /campaign/<slug> page). `did`/`handle` are optional; use a real handle to make the sponsor link resolve in the app.",
+  "_comment": "Fake creatives for the sponsored-links dev server. Edited live: the server re-reads this file on every request. A creative applies to any link whose host is one of `domains` or a subdomain of one; when several match, one is chosen at random per request. Omit bannerUrl/logoUrl to get generated SVG art in the `accent` color — or drop a file named <slug>-banner.* / <slug>-logo.* into ./assets/ to use real art (all creatives below have both). `clickUrl` is where the creative body sends a click (default: the dev server's own /campaign/<slug> page). `did`/`handle` are optional; use a real handle to make the sponsor link resolve in the app.",
   "creatives": [
     {
+      "slug": "baba",
+      "domains": [
+        "berjon.com",
+        "globalvoices.org",
+        "ft.com",
+        "ft.trib.al",
+        "theguardian.com",
+        "guardian.co.uk",
+        "gu.com",
+        "theverge.com",
+        "wired.com",
+        "wrd.cm",
+        "404media.co",
+        "bloomberg.com",
+        "bloom.bg",
+        "nytimes.com",
+        "nyti.ms",
+        "wsj.com"
+      ],
+      "sponsor": {
+        "name": "Rum Baba"
+      },
+      "text": "There's always rum for more.",
+      "accent": "#8b4513",
+      "clickUrl": "https://berjon.com/baba/"
+    },
+    {
+      "slug": "fluff",
+      "domains": [
+        "berjon.com",
+        "globalvoices.org",
+        "ft.com",
+        "ft.trib.al",
+        "theguardian.com",
+        "guardian.co.uk",
+        "gu.com",
+        "theverge.com",
+        "wired.com",
+        "wrd.cm",
+        "404media.co",
+        "bloomberg.com",
+        "bloom.bg",
+        "nytimes.com",
+        "nyti.ms",
+        "wsj.com"
+      ],
+      "sponsor": {
+        "name": "Fluff"
+      },
+      "text": "Where internet cats get furry with it.",
+      "accent": "#f2a5c0",
+      "clickUrl": "https://www.youtube.com/watch?v=dQw4w9WgXcQ"
+    },
+    {
       "slug": "kobler",
-      "domains": ["berjon.com", "globalvoices.org"],
-      "sponsor": {"name": "Kobler", "handle": "kobler.no"},
-      "text": "Ads you can trust.",
+      "domains": [
+        "berjon.com",
+        "globalvoices.org",
+        "ft.com",
+        "ft.trib.al",
+        "theguardian.com",
+        "guardian.co.uk",
+        "gu.com",
+        "theverge.com",
+        "wired.com",
+        "wrd.cm",
+        "404media.co",
+        "bloomberg.com",
+        "bloom.bg",
+        "nytimes.com",
+        "nyti.ms",
+        "wsj.com"
+      ],
+      "sponsor": {
+        "name": "Kobler",
+        "handle": "erik.eurosky.social"
+      },
+      "text": "Annonser som treffer når leseren er i riktig modus.",
       "accent": "#fdf30b",
-      "clickUrl": "https://kobler.no"
+      "clickUrl": "https://kobler.no/"
     },
     {
-      "slug": "whereby",
-      "domains": ["berjon.com", "globalvoices.org"],
-      "sponsor": {"name": "Whereby", "handle": "whereby.com"},
-      "text": "Online meetings that don't make you angry.",
-      "accent": "#f5d2cc",
-      "clickUrl": "https://whereby.com"
+      "slug": "monster",
+      "domains": [
+        "berjon.com",
+        "globalvoices.org",
+        "ft.com",
+        "ft.trib.al",
+        "theguardian.com",
+        "guardian.co.uk",
+        "gu.com",
+        "theverge.com",
+        "wired.com",
+        "wrd.cm",
+        "404media.co",
+        "bloomberg.com",
+        "bloom.bg",
+        "nytimes.com",
+        "nyti.ms",
+        "wsj.com"
+      ],
+      "sponsor": {
+        "name": "Monster Time: The Movie"
+      },
+      "text": "Existential risk for the hegemony.",
+      "accent": "#6a0dad",
+      "clickUrl": "https://en.wikipedia.org/wiki/Antonio_Gramsci"
     },
     {
-      "slug": "supramundane",
-      "domains": ["berjon.com", "globalvoices.org"],
-      "sponsor": {"name": "Supramundane Agency"},
-      "text": "We bring democracy to the internet.",
+      "slug": "mu",
+      "domains": [
+        "berjon.com",
+        "globalvoices.org",
+        "ft.com",
+        "ft.trib.al",
+        "theguardian.com",
+        "guardian.co.uk",
+        "gu.com",
+        "theverge.com",
+        "wired.com",
+        "wrd.cm",
+        "404media.co",
+        "bloomberg.com",
+        "bloom.bg",
+        "nytimes.com",
+        "nyti.ms",
+        "wsj.com"
+      ],
+      "sponsor": {
+        "name": "mu",
+        "handle": "mu.social"
+      },
+      "text": "Holy Cow! Who knew social could be social.",
+      "accent": "#DB4AA6",
+      "clickUrl": "https://hello.mu.social/"
+    },
+    {
+      "slug": "sifa",
+      "domains": [
+        "berjon.com",
+        "globalvoices.org",
+        "ft.com",
+        "ft.trib.al",
+        "theguardian.com",
+        "guardian.co.uk",
+        "gu.com",
+        "theverge.com",
+        "wired.com",
+        "wrd.cm",
+        "404media.co",
+        "bloomberg.com",
+        "bloom.bg",
+        "nytimes.com",
+        "nyti.ms",
+        "wsj.com"
+      ],
+      "sponsor": {
+        "name": "Sifa",
+        "handle": "sifa.id"
+      },
+      "text": "Atmospheric professionalism.",
+      "accent": "#1C8DBA",
+      "clickUrl": "https://sifa.id/"
+    },
+    {
+      "slug": "sm",
+      "domains": [
+        "berjon.com",
+        "globalvoices.org",
+        "ft.com",
+        "ft.trib.al",
+        "theguardian.com",
+        "guardian.co.uk",
+        "gu.com",
+        "theverge.com",
+        "wired.com",
+        "wrd.cm",
+        "404media.co",
+        "bloomberg.com",
+        "bloom.bg",
+        "nytimes.com",
+        "nyti.ms",
+        "wsj.com"
+      ],
+      "sponsor": {
+        "name": "Supramundane Agency",
+        "handle": "supramundane.agency"
+      },
+      "text": "Bringing democracy to the internet.",
       "accent": "#dc1b27",
-      "clickUrl": "https://supramundane.agency"
+      "clickUrl": "https://supramundane.agency/"
     }
   ]
 }
