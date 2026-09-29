@@ -409,13 +409,30 @@ async function handleIndex(res) {
   return '200 index'
 }
 
+/** First entry of a possibly comma-separated header (chained proxies). */
+function firstHeaderValue(value) {
+  return String(value || '')
+    .split(',')[0]
+    .trim()
+}
+
 const server = http.createServer(async (req, res) => {
   if (req.method === 'OPTIONS') {
     res.writeHead(204, CORS)
     res.end()
     return
   }
-  const origin = `http://${req.headers.host || `localhost:${PORT}`}`
+  /*
+   * The absolute URLs handed to the client (art, gift and campaign links) are
+   * built from the public origin. Behind a reverse proxy that is the origin
+   * the proxy saw, not the plain-HTTP hop it forwarded to us.
+   */
+  const proto = firstHeaderValue(req.headers['x-forwarded-proto']) || 'http'
+  const host =
+    firstHeaderValue(req.headers['x-forwarded-host']) ||
+    req.headers.host ||
+    `localhost:${PORT}`
+  const origin = `${proto}://${host}`
   const incoming = new URL(req.url, origin)
   const {pathname} = incoming
   let outcome

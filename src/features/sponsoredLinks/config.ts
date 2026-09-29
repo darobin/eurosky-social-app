@@ -33,13 +33,23 @@ export const SPONSORED_LINKS_ENABLED =
   !!SPONSORED_LINKS_SERVICE_URL
 
 /**
- * Dev-only: domains treated as if the AppView had flagged them, so the client
- * path can be exercised against an AppView that knows nothing about sponsored
- * links. Gated on __DEV__ so it can't ship on.
+ * Whether a release build may honour the simulated flag below. Off unless a
+ * build opts in explicitly, so it cannot ship on by accident; demo deployments
+ * against an AppView that knows nothing about sponsored links set it.
  */
-export const SPONSORED_LINKS_DEV_DOMAINS: readonly string[] = __DEV__
-  ? csv(process.env.EXPO_PUBLIC_SPONSORED_LINKS_DEV_DOMAINS)
-  : []
+const FORCE_DEV_DOMAINS =
+  process.env.EXPO_PUBLIC_SPONSORED_LINKS_FORCE_DEV_DOMAINS === 'true'
+
+/**
+ * Domains treated as if the AppView had flagged them, so the client path can
+ * be exercised against an AppView that knows nothing about sponsored links.
+ * Honoured in __DEV__ builds, and in release builds only with the explicit
+ * opt-in above.
+ */
+export const SPONSORED_LINKS_DEV_DOMAINS: readonly string[] =
+  __DEV__ || FORCE_DEV_DOMAINS
+    ? csv(process.env.EXPO_PUBLIC_SPONSORED_LINKS_DEV_DOMAINS)
+    : []
 
 /**
  * Name of the boolean the AppView adds to `app.bsky.embed.external#viewExternal`

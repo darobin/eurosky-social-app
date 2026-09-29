@@ -92,6 +92,7 @@ shares the original link.
 | ------------------------------------------ | ---------------------------------------------------- |
 | `EXPO_PUBLIC_SPONSORED_LINKS_SERVICE_URL`  | ad service base URL (web dev default: localhost:8789) |
 | `EXPO_PUBLIC_SPONSORED_LINKS_DEV_DOMAINS`  | dev only: domains treated as AppView-flagged         |
+| `EXPO_PUBLIC_SPONSORED_LINKS_FORCE_DEV_DOMAINS` | `true` lets a release build honour the list above (demo deployments only) |
 | `EXPO_PUBLIC_ENABLE_SPONSORED_LINKS`       | kill switch (`false` to force off)                   |
 
 The feature is off whenever no service URL is configured.
@@ -101,7 +102,8 @@ The feature is off whenever no service URL is configured.
 Nothing upstream flags links yet, so development uses two stand-ins:
 
 - the hand-edited `EXPO_PUBLIC_SPONSORED_LINKS_DEV_DOMAINS` list plays the
-  AppView's allow-list (only honoured in `__DEV__` builds), and
+  AppView's allow-list (only honoured in `__DEV__` builds, or in a release
+  build that sets `EXPO_PUBLIC_SPONSORED_LINKS_FORCE_DEV_DOMAINS=true`), and
 - `services/sponsoredLinks/dev-server.mjs` plays the ad service, with fake
   creatives in `services/sponsoredLinks/fixtures.json` and working single-use
   gift redirects. See `services/sponsoredLinks/README.md`.

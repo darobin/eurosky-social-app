@@ -40,3 +40,7 @@ by this process (`/gift/<token>`: 302 once, 410 afterwards).
   stand-in landing page `/campaign/<slug>` when none is set.
 
 The server keeps gift tokens in memory only; restarting it invalidates them.
+
+Behind a reverse proxy (e.g. an HTTPS front) it builds the absolute URLs it
+mints from `X-Forwarded-Proto` / `X-Forwarded-Host`, so art and gift links keep
+the public scheme and host.
