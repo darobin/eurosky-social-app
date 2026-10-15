@@ -91,6 +91,7 @@ import {useEditPostMutation} from '#/state/queries/post'
 import {usePreferencesQuery} from '#/state/queries/preferences'
 import {useProfileQuery} from '#/state/queries/profile'
 import {resolveLinkQueryOptions} from '#/state/queries/resolve-link'
+import {useMuVerificationQuery} from '#/state/queries/verification/useMuVerificationQuery'
 import {
   useAppviewClient,
   useChatClient,
@@ -144,6 +145,12 @@ import {
   IS_WEB_SAFARI,
 } from '#/env'
 import {type Gif} from '#/features/gifPicker/types'
+import {isTileUri} from '#/features/tiles/detect'
+import {
+  canPostTiles,
+  fetchCanPostTiles,
+  TilesNotAllowedError,
+} from '#/features/tiles/permissions'
 import {app, chat} from '#/lexicons'
 import * as bsky from '#/types/bsky'
 import {BottomSheetPortalProvider} from '../../../../modules/bottom-sheet'
@@ -276,6 +283,15 @@ export const ComposePost = ({
   const chatClient = useChatClient()
   const pdsClient = usePdsClient()
   const queryClient = useQueryClient()
+  /*
+   * EUROSKY: tiles may only be posted by accounts verified by one of our
+   * trusted verifiers. The paste-time check in ComposerPost is the friendly
+   * one; this value makes the post pipeline refuse a tile that got through.
+   */
+  const {data: muVerification} = useMuVerificationQuery({
+    did: currentAccount!.did,
+  })
+  const canEmbedTiles = canPostTiles(muVerification)
   /*
    * The host the video service-auth token is minted for. This is the same value
    * that seeds the session's PDS routing, so the audience always matches the host
@@ -1101,6 +1117,8 @@ export const ComposePost = ({
           appviewClient: client,
           chatClient,
           pdsClient,
+          handle: currentAccount!.handle,
+          canEmbedTiles,
         })
       ).uris[0]
 
@@ -1176,6 +1194,8 @@ export const ComposePost = ({
         err = l`We're sorry! The post you are replying to has been deleted.`
       } else if (e instanceof EmbeddingDisabledError) {
         err = l`This post's author has disabled quote posts.`
+      } else if (e instanceof TilesNotAllowedError) {
+        err = l`Only verified accounts can post tiles.`
       }
       setError(err)
       setIsPublishing(false)
@@ -1320,6 +1340,8 @@ export const ComposePost = ({
     initEditPost,
     thread,
     linkQueries,
+    currentAccount,
+    canEmbedTiles,
   ])
 
   const handleConfirmSkipEmpty = () => {
@@ -1666,6 +1688,8 @@ let ComposerPost = memo(function ComposerPost({
   const {currentAccount} = useSession()
   const currentDid = currentAccount!.did
   const {t: l} = useLingui()
+  const queryClient = useQueryClient()
+  const appviewClient = useAppviewClient()
   const {data: currentProfile} = useProfileQuery({did: currentDid})
   const richtext = post.richtext
   const isTextOnly = !post.embed.link && !post.embed.quote && !post.embed.media
@@ -1696,9 +1720,24 @@ let ComposerPost = memo(function ComposerPost({
 
   const onNewLink = useCallback(
     (uri: string) => {
+      // EUROSKY: tiles are for verified accounts; others get told why.
+      if (isTileUri(uri)) {
+        void fetchCanPostTiles(queryClient, appviewClient, currentDid).then(
+          allowed => {
+            if (allowed) {
+              dispatchPost({type: 'embed_add_uri', uri: uri as UriString})
+            } else {
+              Toast.show(l`Only verified accounts can post tiles.`, {
+                type: 'error',
+              })
+            }
+          },
+        )
+        return
+      }
       dispatchPost({type: 'embed_add_uri', uri: uri as UriString})
     },
-    [dispatchPost],
+    [dispatchPost, queryClient, appviewClient, currentDid, l],
   )
 
   const onPhotoPasted = useCallback(

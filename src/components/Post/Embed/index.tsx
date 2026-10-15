@@ -27,6 +27,8 @@ import {Embed as StarterPackCard} from '#/components/StarterPack/StarterPackCard
 import {SubtleHover} from '#/components/SubtleHover'
 import {matchCustomEmbed} from '#/features/customEmbeds/registry'
 import {NewsroomLinkChip} from '#/features/newsrooms/components/NewsroomLinkChip'
+import {TileEmbed} from '#/features/tiles/components/TileEmbed'
+import {getTileRef} from '#/features/tiles/record'
 import {app} from '#/lexicons'
 import * as bsky from '#/types/bsky'
 import {
@@ -101,6 +103,27 @@ function MediaEmbed({
       )
     }
     case 'link': {
+      /*
+       * EUROSKY: a tile post is a link card whose record points at the tile
+       * (https://dasl.ing/). Clicking the card runs the tile in place rather
+       * than following the link. The pointer lives in the record, so this
+       * needs the owning post; without one the card renders as a plain link.
+       */
+      const tileRef = getTileRef(rest.post)
+      if (tileRef) {
+        return (
+          <ContentHider
+            modui={rest.moderation?.ui('contentMedia')}
+            activeStyle={[a.mt_sm]}>
+            <TileEmbed
+              link={embed.view.external}
+              tile={tileRef}
+              onOpen={rest.onOpen}
+              style={[a.mt_sm, rest.style]}
+            />
+          </ContentHider>
+        )
+      }
       // EUROSKY: client-side custom embed handlers (e.g. atmo.rsvp events).
       // Kept additive and above upstream logic to minimize merge conflicts.
       const customEmbed = matchCustomEmbed(embed.view.external)
