@@ -27,6 +27,7 @@ import {Embed as StarterPackCard} from '#/components/StarterPack/StarterPackCard
 import {SubtleHover} from '#/components/SubtleHover'
 import {matchCustomEmbed} from '#/features/customEmbeds/registry'
 import {NewsroomLinkChip} from '#/features/newsrooms/components/NewsroomLinkChip'
+import {useTileAutoplay} from '#/features/tiles/autoplay'
 import {TileEmbed} from '#/features/tiles/components/TileEmbed'
 import {getTileRef} from '#/features/tiles/record'
 import {app} from '#/lexicons'
@@ -91,6 +92,8 @@ function MediaEmbed({
 }: CommonProps & {
   embed: TEmbed
 }) {
+  // EUROSKY: the post a `?tile=activate` URL names skips its card.
+  const autoplayTile = useTileAutoplay(rest.post)
   switch (embed.type) {
     case 'images':
     case 'gallery': {
@@ -119,6 +122,11 @@ function MediaEmbed({
               link={embed.view.external}
               tile={tileRef}
               onOpen={rest.onOpen}
+              autoplay={autoplayTile && !rest.isWithinQuote}
+              fullWidth={
+                !rest.isWithinQuote &&
+                rest.viewContext !== PostEmbedViewContext.ChatMessage
+              }
               style={[a.mt_sm, rest.style]}
             />
           </ContentHider>
